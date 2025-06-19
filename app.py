@@ -3,9 +3,12 @@ import requests
 
 app = Flask(__name__)
 
+
 def get_random_quote():
     try:
-        response = requests.get("https://zenquotes.io/api/random")
+        response = requests.get("https://zenquotes.io/api/random", timeout=5)
+        print("Status Code:", response.status_code)
+        print("Response:", response.text)
         if response.status_code == 200:
             data = response.json()
             return data[0]['q'] + " — " + data[0]['a']
