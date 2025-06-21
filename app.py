@@ -1,21 +1,27 @@
 from flask import Flask, render_template
 import requests
+import random
 
 app = Flask(__name__)
+quote_cache = []
 
+def refill_cache():
+    global quote_cache
+    try:
+        response = requests.get("https://zenquotes.io/api/quotes")
+        if response.status_code == 200:
+            quote_cache = [
+                f"{q['q']} — {q['a']}"
+                for q in response.json()
+                if 'q' in q and 'a' in q
+            ]
+    except Exception as e:
+        quote_cache.append(f"Error: {e}")
 
 def get_random_quote():
-    try:
-        response = requests.get("https://zenquotes.io/api/random", timeout=5)
-        print("Status Code:", response.status_code)
-        print("Response:", response.text)
-        if response.status_code == 200:
-            data = response.json()
-            return data[0]['q'] + " — " + data[0]['a']
-        else:
-            return "Could not fetch quote at the moment."
-    except Exception as e:
-        return f"Error: {e}"
+    if not quote_cache:
+        refill_cache()
+    return random.choice(quote_cache)
 
 @app.route('/')
 def home():
