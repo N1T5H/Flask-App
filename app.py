@@ -21,7 +21,8 @@ def refill_cache():
 def get_random_quote():
     if not quote_cache:
         refill_cache()
-    return random.choice(quote_cache)
+    return random.choice(quote_cache) if quote_cache else "Could not fetch quote at the moment."
+
 
 @app.route('/')
 def home():
